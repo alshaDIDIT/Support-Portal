@@ -1,0 +1,18 @@
+jwt:
+  secret: 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0aWQiOiJiZWJlMjM4Zi1iMGM4LTQwYzMtOTYyMC1jZDRlOGUyMzIwZGMiLCJvaWQiOiI5MjJjMmZiNC0zNWI1LTExZDctOWE2NC0wMGIwZDBmY2I5ZTMiLCJzdWIiOiI5MjJjMmZiNC0zNWI1LTExZDctOWE2NC0wMGIwZDBmY2I5ZTMiLCJlbWFpbCI6InRlc3RAdGVzdC5jb20iLCJpYXQiOjE1MTg0NDk5NzYsImV4cCI6MTUxODQ1MzU3NiwibmJmIjoxNTE4NDQ5OTc2fQ.6InknrU67g_HEkaLxD9Ul5vOzbYGf54mJNcSyPr-xek'
+
+
+server:
+  port: 8081
+
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/support
+    password: nomore
+    username: postgres
+  jpa:
+    show-sql: true
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
