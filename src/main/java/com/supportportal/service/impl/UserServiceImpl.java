@@ -5,6 +5,7 @@ import com.supportportal.domain.UserPrincipal;
 import com.supportportal.exception.domain.EmailExistException;
 import com.supportportal.exception.domain.UsernameExistException;
 import com.supportportal.repository.UserRepository;
+import com.supportportal.service.EmailService;
 import com.supportportal.service.LoginAttemptService;
 import com.supportportal.service.UserService;
 import org.apache.commons.lang3.RandomStringUtils;
@@ -20,6 +21,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import javax.mail.MessagingException;
 import javax.transaction.Transactional;
 import java.util.Date;
 import java.util.List;
@@ -35,16 +37,19 @@ public class UserServiceImpl implements UserService , UserDetailsService {
     private UserRepository userRepository;
     private BCryptPasswordEncoder passwordEncoder;
     private LoginAttemptService loginAttemptService;
+    private EmailService emailService;
 
     @Autowired
     public UserServiceImpl(
             UserRepository userRepository,
             BCryptPasswordEncoder passwordEncoder,
-            LoginAttemptService loginAttemptService
+            LoginAttemptService loginAttemptService,
+            EmailService emailService
             ) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.loginAttemptService = loginAttemptService;
+        this.emailService = emailService;
     }
 
     @Override
@@ -79,8 +84,10 @@ public class UserServiceImpl implements UserService , UserDetailsService {
 
     @Override
     public AppUser register(String firstName, String lastName, String username, String email)
-            throws EmailExistException, UsernameExistException {
+            throws EmailExistException, UsernameExistException, MessagingException {
+
         validateNewUsernameAndEmail(StringUtils.EMPTY, username, email);
+
         AppUser user = new AppUser();
         user.setUserId(generateUserId());
         String password = generatePassword();
@@ -97,8 +104,9 @@ public class UserServiceImpl implements UserService , UserDetailsService {
         user.setAuthorities(ROLE_USER.getAuthorities());
         user.setProfileImageUrl(getTemporaryProfileImageUrl());
         userRepository.save(user);
-        LOGGER.info("New User password: " + password);
-        return user; // password: Ea0E3APR5X
+
+        emailService.sendNewPasswordEmail(firstName, password, email);
+        return user;
     }
 
     @Override
